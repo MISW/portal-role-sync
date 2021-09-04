@@ -1,36 +1,45 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/url"
-	"os"
 	"strings"
+
+	"github.com/heetch/confita"
+	"github.com/heetch/confita/backend/env"
 )
 
 type Portal struct {
 	// APIルートURL
-	API   string
-	Token string
+	API   string `config:"portal-api,required" json:"api"`
+	Token string `config:"portal-token,required" json:"token"`
 }
 
 type Auth0 struct {
-	Domain       string
-	ClientID     string
-	ClientSecret string
+	Domain       string `config:"auth0-domain,required" json:"domain"`
+	ClientID     string `config:"auth0-client-id,required" json:"client_id"`
+	ClientSecret string `config:"auth0-client-secret,required" json:"client_secret"`
 }
 
 type Config struct {
-	Portal Portal
-	Auth0  Auth0
+	Portal Portal `json:"portal"`
+	Auth0  Auth0  `json:"auth0"`
 }
 
-func ReadConfig() (*Config, error) {
+func ReadConfig(ctx context.Context) (*Config, error) {
+	loader := confita.NewLoader(
+		env.NewBackend(),
+	)
+
 	config := Config{}
 
-	portalAPI := os.Getenv("PORTAL_API")
+	if err := loader.Load(ctx, &config); err != nil {
+		return nil, fmt.Errorf("failed to load config: %w", err)
+	}
 
-	portalAPIURL, err := url.Parse(portalAPI)
+	portalAPIURL, err := url.Parse(config.Portal.API)
 
 	if err != nil {
 		return nil, fmt.Errorf("envvar \"PORTAL_API\" must be a valid URL that indicates API Root of MIS.W Portal: %w", err)
@@ -39,40 +48,6 @@ func ReadConfig() (*Config, error) {
 	if !strings.HasSuffix(portalAPIURL.Path, "/") {
 		log.Println("there is no \"/\" at the end of \"PORTAL_API\". you may have problems around relative paths calculation.")
 	}
-
-	config.Portal.API = portalAPI
-
-	portalToken := os.Getenv("PORTAL_TOKEN")
-
-	if portalToken == "" {
-		return nil, fmt.Errorf("envvar \"PORTAL_TOKEN\" is required")
-	}
-
-	config.Portal.Token = portalToken
-
-	auth0Domain := os.Getenv("AUTH0_DOMAIN")
-
-	if auth0Domain == "" {
-		return nil, fmt.Errorf("envvar \"AUTH0_DOMAIN\" is required")
-	}
-
-	config.Auth0.Domain = auth0Domain
-
-	auth0ClientID := os.Getenv("AUTH0_CLIENT_ID")
-
-	if auth0ClientID == "" {
-		return nil, fmt.Errorf("envvar \"AUTH0_CLIENT_ID\" is required")
-	}
-
-	config.Auth0.ClientID = auth0ClientID
-
-	auth0ClientSecret := os.Getenv("AUTH0_CLIENT_SECRET")
-
-	if auth0ClientSecret == "" {
-		return nil, fmt.Errorf("envvar \"AUTH0_CLIENT_SECRET\" is required")
-	}
-
-	config.Auth0.ClientSecret = auth0ClientSecret
 
 	return &config, nil
 }

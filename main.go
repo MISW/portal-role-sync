@@ -16,7 +16,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	config, err := config.ReadConfig()
+	config, err := config.ReadConfig(ctx)
 
 	if err != nil {
 		log.Fatalln(err)
