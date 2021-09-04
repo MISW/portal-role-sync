@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/MISW/auth0-portal-applier/config"
-	"github.com/MISW/auth0-portal-applier/infra/auth0"
-	"github.com/MISW/auth0-portal-applier/infra/portal"
+	"github.com/MISW/portal-role-sync/config"
+	"github.com/MISW/portal-role-sync/infra/auth0"
+	"github.com/MISW/portal-role-sync/infra/portal"
 )
 
 func main() {

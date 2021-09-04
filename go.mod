@@ -1,4 +1,4 @@
-module github.com/MISW/auth0-portal-applier
+module github.com/MISW/portal-role-sync
 
 go 1.17
 
