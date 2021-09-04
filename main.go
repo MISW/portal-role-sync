@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
@@ -10,6 +9,7 @@ import (
 	"github.com/MISW/portal-role-sync/config"
 	"github.com/MISW/portal-role-sync/infra/auth0"
 	"github.com/MISW/portal-role-sync/infra/portal"
+	"github.com/MISW/portal-role-sync/reconciler"
 )
 
 func main() {
@@ -24,38 +24,22 @@ func main() {
 
 	portalClient := portal.NewClient(config.Portal.API, config.Portal.Token)
 
+	auth0AuthConfig := auth0.NewConfig(config.Auth0.Domain, config.Auth0.ClientID, config.Auth0.ClientSecret)
+	auth0Client := auth0.NewClient(config.Auth0.Domain, auth0AuthConfig.TokenSource(ctx))
+
+	auth0Reconciler := reconciler.NewAuth0Reconciler(auth0Client)
+
 	memberRoles, err := portalClient.GetAllMemberRoles(ctx)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	members := map[string]string{}
-
-	for k, member := range memberRoles {
-		if member.Role == "member" || member.Role == "admin" {
-			members[k] = member.Role
-		}
+	req := &reconciler.ReconcileRequest{
+		Members: memberRoles,
 	}
 
-	membersValue, err := json.Marshal(members)
-
-	if err != nil {
+	if err := auth0Reconciler.Reconcile(ctx, req); err != nil {
 		log.Fatalln(err)
 	}
-
-	authConfig := auth0.NewConfig(config.Auth0.Domain, config.Auth0.ClientID, config.Auth0.ClientSecret)
-
-	token, err := authConfig.Token(ctx)
-
-	if err != nil {
-		panic(err)
-	}
-
-	auth0Client := auth0.NewClient(config.Auth0.Domain, token)
-
-	if err := auth0Client.UpdateRuleConfig(ctx, "members", string(membersValue)); err != nil {
-		panic(err)
-	}
-
 }

@@ -17,18 +17,18 @@ type Client interface {
 }
 
 type client struct {
-	domain     string
-	token      *oauth2.Token
-	httpClient *http.Client
+	domain      string
+	tokenSource oauth2.TokenSource
+	httpClient  *http.Client
 }
 
 var _ Client = &client{}
 
-func NewClient(domain string, token *oauth2.Token) Client {
+func NewClient(domain string, tokenSource oauth2.TokenSource) Client {
 	return &client{
-		domain:     domain,
-		token:      token,
-		httpClient: http.DefaultClient,
+		domain:      domain,
+		tokenSource: tokenSource,
+		httpClient:  http.DefaultClient,
 	}
 }
 
@@ -37,6 +37,12 @@ type auth0ErrorJSON struct {
 }
 
 func (c *client) UpdateRuleConfig(ctx context.Context, key, value string) error {
+	token, err := c.tokenSource.Token()
+
+	if err != nil {
+		return fmt.Errorf("failed to obtain token: %w", err)
+	}
+
 	reqBody, err := json.Marshal(map[string]string{
 		"value": value,
 	})
@@ -54,7 +60,7 @@ func (c *client) UpdateRuleConfig(ctx context.Context, key, value string) error 
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	c.token.SetAuthHeader(req)
+	token.SetAuthHeader(req)
 
 	resp, err := c.httpClient.Do(req)
 
