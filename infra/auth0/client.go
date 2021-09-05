@@ -1,3 +1,5 @@
+//go:generate mockgen -source=$GOFILE -package=mock_$GOPACKAGE -destination=../mock/$GOPACKAGE/$GOFILE
+
 package auth0
 
 import (
