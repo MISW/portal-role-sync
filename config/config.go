@@ -13,14 +13,14 @@ import (
 
 type Portal struct {
 	// APIルートURL
-	API   string `config:"portal-api,required" json:"api"`
-	Token string `config:"portal-token,required" json:"token"`
+	API   string `config:"portal_api,required" json:"api"`
+	Token string `config:"portal_token,required" json:"token"`
 }
 
 type Auth0 struct {
-	Domain       string `config:"auth0-domain,required" json:"domain"`
-	ClientID     string `config:"auth0-client-id,required" json:"client_id"`
-	ClientSecret string `config:"auth0-client-secret,required" json:"client_secret"`
+	Domain       string `config:"auth0_domain,required" json:"domain"`
+	ClientID     string `config:"auth0_client_id,required" json:"client_id"`
+	ClientSecret string `config:"auth0_client_secret,required" json:"client_secret"`
 }
 
 type Config struct {

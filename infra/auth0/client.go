@@ -38,6 +38,9 @@ type auth0ErrorJSON struct {
 	Message string `json:"message"`
 }
 
+// UpdateRuleConfig auth0のmanagement-apiを使ってメンバー(のロールの)情報をauth0のrules configにセットする。
+// (e.g. key: "members", value: ${JSON data}
+// https://auth0.com/docs/api/management/v2#!/Rules_Configs/put_rules_configs_by_key
 func (c *client) UpdateRuleConfig(ctx context.Context, key, value string) error {
 	token, err := c.tokenSource.Token()
 
