@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/MISW/portal-role-sync/infra/auth0"
 )
@@ -28,6 +29,7 @@ func (r *auth0Reconciler) Reconcile(ctx context.Context, req *ReconcileRequest) 
 	}
 
 	membersJSON, err := json.Marshal(members)
+	log.Print(members)
 
 	if err != nil {
 		return fmt.Errorf("failed to marshal members: %w", err)
