@@ -1,12 +1,19 @@
-FROM golang:1.18 AS builder
+# workspace
+FROM golang:1.19 AS workspace
 
-COPY . /work
-WORKDIR /work
-ENV CGO_ENABLED=0
-RUN go build -o /portal-role-sync
+COPY . /portal-role-sync
 
-FROM gcr.io/distroless/static:debug
+WORKDIR /portal-role-sync
 
-COPY --from=builder /portal-role-sync /bin
+RUN go mod download \
+ && CGO_ENABLED=0 go build -o /portal-role-sync/portal-role-sync
 
-ENTRYPOINT [ "/bin/portal-role-sync" ]
+# production
+FROM gcr.io/distroless/base:debug AS production
+
+RUN ["/busybox/sh", "-c", "ln -s /busybox/sh /bin/sh"]
+RUN ["/busybox/sh", "-c", "ln -s /bin/env /usr/bin/env"]
+
+COPY --from=workspace /portal-role-sync/portal-role-sync /bin/portal-role-sync
+
+ENTRYPOINT ["/bin/portal-role-sync"]
