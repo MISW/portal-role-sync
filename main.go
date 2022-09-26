@@ -36,7 +36,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	i := 0
 	for k, v := range portalMemberRoles {
+
 		//auth0にユーザが存在しない場合、そもそもログインできしロール設定もできないので実行しない。
 		auth0MemberPortalRole, ok := auth0MemberPortalRoles[k]
 		if !ok {
@@ -49,9 +51,11 @@ func main() {
 			if err := auth0Client.UpdateUserPortalRole(ctx, k, v.Role); err != nil {
 				log.Fatalln(err)
 			}
+			//成功
+			i++
+			log.Printf("updated user {%s} role to {%s}", k, v.Role)
 		}
-
-		//成功
-		log.Printf("updated user {%s} role to {%s}", k, v.Role)
 	}
+
+	log.Printf("Changed: %d\n", i)
 }
