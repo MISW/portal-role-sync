@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	portal "github.com/MISW/portal-role-sync/infra/portal"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -34,6 +35,21 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
+// GetUserPortalRoles mocks base method.
+func (m *MockClient) GetUserPortalRoles(ctx context.Context) (portal.MemberRoles, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserPortalRoles", ctx)
+	ret0, _ := ret[0].(portal.MemberRoles)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserPortalRoles indicates an expected call of GetUserPortalRoles.
+func (mr *MockClientMockRecorder) GetUserPortalRoles(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserPortalRoles", reflect.TypeOf((*MockClient)(nil).GetUserPortalRoles), ctx)
+}
+
 // UpdateRuleConfig mocks base method.
 func (m *MockClient) UpdateRuleConfig(ctx context.Context, key, value string) error {
 	m.ctrl.T.Helper()
@@ -46,4 +62,18 @@ func (m *MockClient) UpdateRuleConfig(ctx context.Context, key, value string) er
 func (mr *MockClientMockRecorder) UpdateRuleConfig(ctx, key, value interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRuleConfig", reflect.TypeOf((*MockClient)(nil).UpdateRuleConfig), ctx, key, value)
+}
+
+// UpdateUserPortalRole mocks base method.
+func (m *MockClient) UpdateUserPortalRole(ctx context.Context, roleKey, role string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserPortalRole", ctx, roleKey, role)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserPortalRole indicates an expected call of UpdateUserPortalRole.
+func (mr *MockClientMockRecorder) UpdateUserPortalRole(ctx, roleKey, role interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPortalRole", reflect.TypeOf((*MockClient)(nil).UpdateUserPortalRole), ctx, roleKey, role)
 }
