@@ -37,18 +37,21 @@ func main() {
 	}
 
 	for k, v := range portalMemberRoles {
+		//auth0にユーザが存在しない場合、そもそもログインできしロール設定もできないので実行しない。
 		auth0MemberPortalRole, ok := auth0MemberPortalRoles[k]
 		if !ok {
-			//auth0にユーザが存在しない場合、そもそもログインできないのでロール設定は実行しない。
-			//ただし、会員だけどユーザが存在しないという場合に限り、createしてしまう.
 			log.Printf("user {%s} with role {%s} does not exist in auth0 users.\n", k, v.Role)
 			continue
 		}
+
+		// ロールが不一致の場合、ロールをアップデートする
 		if v.Role != auth0MemberPortalRole.Role {
 			if err := auth0Client.UpdateUserPortalRole(ctx, k, v.Role); err != nil {
 				log.Fatalln(err)
 			}
 		}
+
+		//成功
 		log.Printf("updated user {%s} role to {%s}", k, v.Role)
 	}
 }

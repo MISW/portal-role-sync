@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/MISW/portal-role-sync/infra/portal"
 	"golang.org/x/oauth2"
@@ -48,8 +47,6 @@ type auth0Member struct {
 	UserID          string           `json:"user_id"`
 	AppMetadataRole auth0AppMetadata `json:"app_metadata"`
 }
-
-const userIdSlackPrefix = "oauth2|slack|"
 
 // UpdateRuleConfig auth0のmanagement-apiを使ってメンバー(のロールの)情報をauth0のrules configにセットする。
 // (e.g. key: "members", value: ${JSON data}
@@ -147,11 +144,8 @@ func (c *client) GetUserPortalRoles(ctx context.Context) (portal.MemberRoles, er
 
 	portalMemberRoles := make(portal.MemberRoles, 0)
 	for _, v := range auth0Members {
-		if !strings.HasPrefix(v.UserID, userIdSlackPrefix) {
-			return nil, fmt.Errorf("failed to find slack_id prefix in user_od. %s doesn's have prefix %s", v.UserID, userIdSlackPrefix)
-		}
-		slackID := strings.TrimPrefix(v.UserID, userIdSlackPrefix)
-		portalMemberRoles[slackID] = portal.MemberRole{
+		accountID := v.UserID
+		portalMemberRoles[accountID] = portal.MemberRole{
 			Role: v.AppMetadataRole.PortalRole,
 		}
 	}
@@ -159,8 +153,8 @@ func (c *client) GetUserPortalRoles(ctx context.Context) (portal.MemberRoles, er
 	return portalMemberRoles, nil
 }
 
-//UpdateUserPortalRoles appMetaDataにみすポータルのロール情報をセットする
-func (c *client) UpdateUserPortalRole(ctx context.Context, slackID, role string) error {
+// UpdateUserPortalRoles appMetaDataにみすポータルのロール情報をセットする
+func (c *client) UpdateUserPortalRole(ctx context.Context, accountID, role string) error {
 	token, err := c.tokenSource.Token()
 	if err != nil {
 		return fmt.Errorf("failed to obtain token: %w", err)
@@ -177,7 +171,7 @@ func (c *client) UpdateUserPortalRole(ctx context.Context, slackID, role string)
 		return fmt.Errorf("failed to marshal json. %w", err)
 	}
 
-	userID := fmt.Sprintf("%s%s", userIdSlackPrefix, slackID)
+	userID := accountID
 	endpoint := fmt.Sprintf("https://%s/api/v2/users/%s", c.domain, userID)
 	req, err := http.NewRequestWithContext(ctx, "PATCH", endpoint, bytes.NewBuffer(reqBody))
 	if err != nil {
