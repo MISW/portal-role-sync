@@ -6,7 +6,7 @@ COPY . /portal-role-sync
 WORKDIR /portal-role-sync
 
 RUN go mod download \
- && CGO_ENABLED=0 go build -o /portal-role-sync/portal-role-sync
+ && go build -buildmode pie -o /portal-role-sync/portal-role-sync
 
 # production
 FROM gcr.io/distroless/base:debug AS production
