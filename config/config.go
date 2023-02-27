@@ -1,45 +1,48 @@
 package config
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/url"
 	"strings"
 
-	"github.com/heetch/confita"
-	"github.com/heetch/confita/backend/env"
+	"github.com/caarlos0/env/v7"
+	"golang.org/x/xerrors"
 )
 
 type Portal struct {
 	// APIルートURL
-	API   string `config:"portal_api,required" json:"api"`
-	Token string `config:"portal_token,required" json:"token"`
+	API   string `env:"PORTAL_API,required"`
+	Token string `env:"PORTAL_TOKEN,required"`
 }
 
 type Auth0 struct {
-	Domain       string `config:"auth0_domain,required" json:"domain"`
-	ClientID     string `config:"auth0_client_id,required" json:"client_id"`
-	ClientSecret string `config:"auth0_client_secret,required" json:"client_secret"`
+	Domain       string `env:"AUTH0_DOMAIN,required"`
+	ClientID     string `env:"AUTH0_CLIENT_ID,required"`
+	ClientSecret string `env:"AUTH0_CLIENT_SECRET,required"`
 }
 
 type Config struct {
-	Portal Portal `json:"portal"`
-	Auth0  Auth0  `json:"auth0"`
+	Portal Portal
+	Auth0  Auth0
 }
 
-func ReadConfig(ctx context.Context) (*Config, error) {
-	loader := confita.NewLoader(
-		env.NewBackend(),
-	)
+func ReadConfig() (*Config, error) {
+	var cfg Config
 
-	config := Config{}
-
-	if err := loader.Load(ctx, &config); err != nil {
-		return nil, fmt.Errorf("failed to load config: %w", err)
+	err := env.Parse(&cfg.Portal)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to perse config: %w", err)
 	}
 
-	portalAPIURL, err := url.Parse(config.Portal.API)
+	err = env.Parse(&cfg.Auth0)
+	if err != nil {
+		return nil, xerrors.Errorf("failed to perse config: %w", err)
+	}
+
+	fmt.Println(cfg)
+
+	portalAPIURL, err := url.Parse(cfg.Portal.API)
 
 	if err != nil {
 		return nil, fmt.Errorf("envvar \"PORTAL_API\" must be a valid URL that indicates API Root of MIS.W Portal: %w", err)
@@ -49,5 +52,5 @@ func ReadConfig(ctx context.Context) (*Config, error) {
 		log.Println("there is no \"/\" at the end of \"PORTAL_API\". you may have problems around relative paths calculation.")
 	}
 
-	return &config, nil
+	return &cfg, err
 }
