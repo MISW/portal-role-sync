@@ -6,6 +6,7 @@
 
 1. [portal](https://github.com/MISW/Portal)の api を叩いてユーザー(とそのロール)一覧の情報を取得する。
 2. auth0 の management-api を叩いて user の app_metadata に
+
    ```app_metadata.json
    {
        "app_metadata": {
@@ -13,6 +14,7 @@
        }
    }
    ```
+
    をセットする。
    (Auth0 ではこの`portal_role`を認証に用いている。例えばロールが`member`と`admin`のユーザーのみ許可するなど。)
    なお、初めから全ユーザの meta_data 更新をした場合 api を叩く limit を超えるため、一旦 get してから、update の必要があるものだけ update する。
