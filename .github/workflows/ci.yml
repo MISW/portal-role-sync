@@ -33,7 +33,7 @@ jobs:
         run: go install honnef.co/go/tools/cmd/staticcheck@latest && staticcheck ./...
 
       - name: Build
-        run: go build -buildmode pie
+        run: CGO_ENABLED=0 go build -buildmode pie
 
       - name: Codecov
         uses: codecov/codecov-action@v3
