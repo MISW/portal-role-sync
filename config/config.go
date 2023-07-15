@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/caarlos0/env/v8"
+	"github.com/caarlos0/env/v9"
 	"golang.org/x/xerrors"
 )
 
