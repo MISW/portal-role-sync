@@ -3,7 +3,7 @@ module github.com/MISW/portal-role-sync
 go 1.21
 
 require (
-	github.com/caarlos0/env/v10 v10.0.0
+	github.com/caarlos0/env/v11 v11.2.2
 	github.com/caarlos0/env/v11 v11.2.2
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/golang/mock v1.6.0
