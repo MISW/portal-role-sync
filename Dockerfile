@@ -1,5 +1,5 @@
 # workspace
-FROM golang:1.25 AS workspace
+FROM golang:1.26 AS workspace
 
 COPY . /portal-role-sync
 
