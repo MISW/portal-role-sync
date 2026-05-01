@@ -5,7 +5,7 @@ go 1.25.0
 toolchain go1.26.2
 
 require (
-	github.com/caarlos0/env/v11 v11.4.0
+	github.com/caarlos0/env/v11 v11.4.1
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/golang/mock v1.6.0
 	golang.org/x/oauth2 v0.36.0
