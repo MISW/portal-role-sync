@@ -2,7 +2,7 @@ module github.com/MISW/portal-role-sync
 
 go 1.25.0
 
-toolchain go1.26.5
+toolchain go1.26.6
 
 require (
 	github.com/caarlos0/env/v11 v11.4.1
